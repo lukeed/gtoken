@@ -5,7 +5,6 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import { extname } from 'path';
 import { stringify } from 'querystring';
 import { get, post } from 'httpie';
 import { sign } from 'jws';
