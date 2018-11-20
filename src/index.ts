@@ -114,15 +114,13 @@ export class GoogleToken {
     switch (extname(keyFile)) {
       case '.json': {
         const key = await read(keyFile, 'utf8');
-        const body = JSON.parse(key);
-        const privateKey = body.private_key;
-        const clientEmail = body.client_email;
-        if (!privateKey || !clientEmail) {
+        const { private_key, client_email } = JSON.parse(key);
+        if (!private_key || !client_email) {
           throw new ErrorWithCode(
               'private_key and client_email are required.',
               'MISSING_CREDENTIALS');
         }
-        return { privateKey, clientEmail };
+        return { privateKey:private_key, clientEmail:client_email };
       }
       case '.pem': {
         const privateKey = await read(keyFile, 'utf8');
