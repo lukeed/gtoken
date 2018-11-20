@@ -5,13 +5,13 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import * as fs from 'fs';
+import { readFile } from 'fs';
 import { promisify } from 'util';
 import {request} from 'gaxios';
 import * as jws from 'jws';
 import * as mime from 'mime';
 
-const readFile = promisify(fs.readFile);
+const read = promisify(readFile);
 
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
 const GOOGLE_REVOKE_TOKEN_URL =
@@ -115,7 +115,7 @@ export class GoogleToken {
     switch (mimeType) {
       case 'application/json': {
         // *.json file
-        const key = await readFile(keyFile, 'utf8');
+        const key = await read(keyFile, 'utf8');
         const body = JSON.parse(key);
         const privateKey = body.private_key;
         const clientEmail = body.client_email;
@@ -128,7 +128,7 @@ export class GoogleToken {
       }
       case 'application/x-x509-ca-cert': {
         // *.pem file
-        const privateKey = await readFile(keyFile, 'utf8');
+        const privateKey = await read(keyFile, 'utf8');
         return {privateKey};
       }
       default:
