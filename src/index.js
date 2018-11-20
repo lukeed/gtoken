@@ -5,12 +5,12 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import encode from 'qss';
 import { sign } from 'jws';
-import { extname } from 'path';
-import { promisify } from 'util';
-import { get, post } from 'httpie';
 import { readFile } from 'fs';
+import { get, post } from 'httpie';
+import { stringify } from 'querystring';
+import { promisify } from 'util';
+import { extname } from 'path';
 
 const read = promisify(readFile);
 
@@ -125,8 +125,8 @@ export class GoogleToken {
 		}, this.additionalClaims);
 
 		let assertion = sign({ header:{ alg }, payload, secret:this.key });
-		let uri = encode({ grant_type, assertion }, GOOGLE_TOKEN_URL + '?');
 		let headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+		let uri = GOOGLE_TOKEN_URL + '?' + stringify({ grant_type, assertion });
 
 		return post(uri, { headers }).then(r => {
 			this.rawToken = r.data;
