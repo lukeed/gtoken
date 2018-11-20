@@ -14,6 +14,7 @@ const GOOGLE_REVOKE_TOKEN_URL = 'https://accounts.google.com/o/oauth2/revoke?tok
 
 const alg = 'RS256';
 const grant_type = 'urn:ietf:params:oauth:grant-type:jwt-bearer';
+const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
 
 export class GoogleToken {
 	constructor(opts) {
@@ -85,9 +86,8 @@ export class GoogleToken {
 			iat,
 		}, this.additionalClaims);
 
-		let body = stringify({ grant_type, assertion });
-		let headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
 		let assertion = sign({ header:{ alg }, payload, secret:this.key });
+		let body = stringify({ grant_type, assertion });
 
 		return post(GOOGLE_TOKEN_URL, { headers, body }).then(r => {
 			this.rawToken = r.data;
