@@ -85,11 +85,11 @@ export class GoogleToken {
 			iat,
 		}, this.additionalClaims);
 
-		let assertion = sign({ header:{ alg }, payload, secret:this.key });
+		let body = stringify({ grant_type, assertion });
 		let headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-		let uri = GOOGLE_TOKEN_URL + '?' + stringify({ grant_type, assertion });
+		let assertion = sign({ header:{ alg }, payload, secret:this.key });
 
-		return post(uri, { headers }).then(r => {
+		return post(GOOGLE_TOKEN_URL, { headers, body }).then(r => {
 			this.rawToken = r.data;
 			this.token = r.data.access_token;
 			this.expiresAt = (r.data.expires_in == null) ? null : (iat + r.data.expires_in) * 1e3;

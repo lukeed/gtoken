@@ -21,7 +21,7 @@
     "test": "tape test/*.js | tap-spec"
   },
   "dependencies": {
-    "httpie": "^0.1.0",
+    "httpie": "^0.1.1",
     "jws": "^3.1.5"
   },
   "devDependencies": {
