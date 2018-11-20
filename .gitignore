@@ -1,6 +1,10 @@
 node_modules
-build/
-coverage/
+.DS_Store
+*-lock.json
+*.lock
+*.log
+
 .nyc_output/
-.vscode/
-package-lock.json
+coverage/
+
+dist
