@@ -107,7 +107,7 @@ export class GoogleToken {
 
   /**
    * Given a keyFile, extract the key and client email if available
-   * @param keyFile Path to a json, pem, or p12 file that contains the key.
+   * @param keyFile Path to a json, or pem file that contains the key.
    * @returns an object with privateKey and clientEmail properties
    */
   async getCredentials(keyFile: string): Promise<Credentials> {
@@ -131,22 +131,10 @@ export class GoogleToken {
         const privateKey = await readFile(keyFile, 'utf8');
         return {privateKey};
       }
-      case 'application/x-pkcs12': {
-        // *.p12 file
-        // NOTE:  The loading of `google-p12-pem` is deferred for performance
-        // reasons.  The `node-forge` npm module in `google-p12-pem` adds a fair
-        // bit time to overall module loading, and is likely not frequently
-        // used.  In a future release, p12 support will be entirely removed.
-        if (!getPem) {
-          getPem = (await import('google-p12-pem')).getPem;
-        }
-        const privateKey = await getPem(keyFile);
-        return {privateKey};
-      }
       default:
         throw new ErrorWithCode(
             'Unknown certificate type. Type is determined based on file extension. ' +
-                'Current supported extensions are *.json, *.pem, and *.p12.',
+                'Current supported extensions are *.json, and *.pem.',
             'UNKNOWN_CERTIFICATE_TYPE');
     }
   }
