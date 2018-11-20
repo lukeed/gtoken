@@ -8,8 +8,9 @@
 import { readFile } from 'fs';
 import { extname } from 'path';
 import { promisify } from 'util';
+import { get, post } from 'httpie';
 import { sign } from 'jws';
-import {request} from 'gaxios';
+import encode from 'qss';
 
 const read = promisify(readFile);
 
@@ -167,14 +168,14 @@ export class GoogleToken {
 		if (!this.token) {
 			throw new Error('No token to revoke.');
 		}
-		return request({url: GOOGLE_REVOKE_TOKEN_URL + this.token}).then(r => {
+		return get(GOOGLE_REVOKE_TOKEN_URL + this.token).then(r => {
 			this.configure({
+				key: this.key,
+				scope: this.scope,
+				keyFile: this.keyFile,
+				additionalClaims: this.additionalClaims,
 				email: this.iss,
 				sub: this.sub,
-				key: this.key,
-				keyFile: this.keyFile,
-				scope: this.scope,
-				additionalClaims: this.additionalClaims,
 			});
 		});
 	}
@@ -215,12 +216,9 @@ export class GoogleToken {
 		const grant_type = 'urn:ietf:params:oauth:grant-type:jwt-bearer';
 		const assertion = sign({ header, payload, secret:this.key });
 
-		return request<TokenData>({
-			method: 'POST',
-			url: GOOGLE_TOKEN_URL,
-			data: { grant_type, assertion },
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-		}).then(r => {
+		const uri = encode({ grant_type, assertion }, GOOGLE_TOKEN_URL + '?');
+		const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+		return post<TokenData>(uri, { headers }).then(r => {
 			this.rawToken = r.data;
 			this.token = r.data.access_token;
 			this.expiresAt = (r.data.expires_in == null) ? null : (iat + r.data.expires_in!) * 1e3;
@@ -228,7 +226,7 @@ export class GoogleToken {
 		}).catch(err => {
 			this.token = null;
 			this.tokenExpires = null;
-			const body = (err.response && err.response.data) ? err.response.data : {};
+			const body = err.data || {};
 			if (body.error) {
 				let msg = String(body.error);
 				if (body.error_description) msg += `: ${body.error_description}`;

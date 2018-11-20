@@ -18,8 +18,9 @@
     "test": "nyc mocha build/test"
   },
   "dependencies": {
-    "gaxios": "^1.0.2",
-    "jws": "^3.1.5"
+    "httpie": "^0.1.0",
+    "jws": "^3.1.5",
+    "qss": "^1.0.1"
   },
   "devDependencies": {
     "@types/jws": "^3.1.0",
