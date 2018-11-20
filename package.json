@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "build": "node builder",
-    "test": "nyc mocha build/test"
+    "pretest": "node builder",
+    "test": "tape test/*.js | tap-spec"
   },
   "dependencies": {
     "httpie": "^0.1.0",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "mk-dirs": "^1.0.0",
+    "nock": "^10.0.2",
     "tap-spec": "^5.0.0",
     "tape": "^4.9.1"
   }
