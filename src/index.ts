@@ -6,10 +6,10 @@
  */
 
 import { readFile } from 'fs';
+import { extname } from 'path';
 import { promisify } from 'util';
 import {request} from 'gaxios';
 import * as jws from 'jws';
-import * as mime from 'mime';
 
 const read = promisify(readFile);
 
@@ -111,10 +111,8 @@ export class GoogleToken {
    * @returns an object with privateKey and clientEmail properties
    */
   async getCredentials(keyFile: string): Promise<Credentials> {
-    const mimeType = mime.getType(keyFile);
-    switch (mimeType) {
-      case 'application/json': {
-        // *.json file
+    switch (extname(keyFile)) {
+      case '.json': {
         const key = await read(keyFile, 'utf8');
         const body = JSON.parse(key);
         const privateKey = body.private_key;
@@ -124,17 +122,16 @@ export class GoogleToken {
               'private_key and client_email are required.',
               'MISSING_CREDENTIALS');
         }
-        return {privateKey, clientEmail};
+        return { privateKey, clientEmail };
       }
-      case 'application/x-x509-ca-cert': {
-        // *.pem file
+      case '.pem': {
         const privateKey = await read(keyFile, 'utf8');
-        return {privateKey};
+        return { privateKey };
       }
       default:
         throw new ErrorWithCode(
             'Unknown certificate type. Type is determined based on file extension. ' +
-                'Current supported extensions are *.json, and *.pem.',
+                'Current supported extensions are *.json and *.pem.',
             'UNKNOWN_CERTIFICATE_TYPE');
     }
   }
