@@ -5,43 +5,16 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import { sign } from 'jws';
-import { readFile } from 'fs';
-import { get, post } from 'httpie';
-import { stringify } from 'querystring';
-import { promisify } from 'util';
 import { extname } from 'path';
-
-const read = promisify(readFile);
+import { stringify } from 'querystring';
+import { get, post } from 'httpie';
+import { sign } from 'jws';
 
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
 const GOOGLE_REVOKE_TOKEN_URL = 'https://accounts.google.com/o/oauth2/revoke?token=';
 
 const alg = 'RS256';
 const grant_type = 'urn:ietf:params:oauth:grant-type:jwt-bearer';
-
-/**
- * Given a keyFile, extract the key and client email if available
- * @param  {string} keyFile   Path to a `.json|pem` file with key.
- * @return {object}  					A { privkey, email } object
- */
-async function toParse(keyFile) {
-	const ext = extname(keyFile);
-
-	if (ext === '.json') {
-		const key = await read(keyFile, 'utf8');
-		const { private_key, client_email } = JSON.parse(key);
-		if (!private_key || !client_email) throw new Error('private_key and client_email are required.');
-		return { privkey:private_key, email:client_email };
-	}
-
-	if (ext === '.pem') {
-		const privkey = await read(keyFile, 'utf8');
-		return { privkey };
-	}
-
-	throw new Error('Unknown certificate type! Only *.json and *.pem files are supported.');
-}
 
 export class GoogleToken {
 	constructor(opts) {
@@ -57,7 +30,6 @@ export class GoogleToken {
 	 */
 	configure(opts={}) {
 		this.key = opts.key;
-		this.keyFile = opts.keyFile;
 		this.iss = opts.email || opts.iss;
 		this.additionalClaims = opts.additionalClaims;
 		this.token = this.expiresAt = this.rawToken = null;
@@ -73,17 +45,8 @@ export class GoogleToken {
 			return Promise.resolve(this.token);
 		}
 
-		if (!this.key && !this.keyFile) {
-			throw new Error('No key or keyFile set.');
-		}
-
-		if (!this.key && this.keyFile) {
-			const obj = await toParse(this.keyFile);
-			this.iss = obj.email || this.iss;
-			this.key = obj.privkey;
-			if (!this.iss) {
-				throw new Error('email is required');
-			}
+		if (!this.key) {
+			throw new Error('No key set.');
 		}
 
 		return this.requestToken();
@@ -101,7 +64,6 @@ export class GoogleToken {
 			this.configure({
 				key: this.key,
 				scope: this.scope,
-				keyFile: this.keyFile,
 				additionalClaims: this.additionalClaims,
 				email: this.iss,
 				sub: this.sub,

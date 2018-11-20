@@ -11,46 +11,15 @@ const { GoogleToken } = require('../dist/gtoken');
 const nock = require('nock');
 
 const EMAIL = 'example@developer.gserviceaccount.com';
-const UNKNOWN_KEYFILE = './test/assets/key';
-const KEYFILE = './test/assets/key.pem';
-const KEYFILEJSON = './test/assets/key.json';
-const KEYFILENOEMAILJSON = './test/assets/key-no-email.json';
-const KEYCONTENTS = readFileSync(KEYFILE, 'utf8');
-const KEYJSONCONTENTS = readFileSync(KEYFILEJSON, 'utf8');
+const KEYCONTENTS = readFileSync('./test/assets/key.pem', 'utf8');
+const KEYJSONCONTENTS = readFileSync('./test/assets/key.json', 'utf8');
 const GOOGLE_TOKEN_URLS = ['https://www.googleapis.com', '/oauth2/v4/token'];
-const GOOGLE_REVOKE_TOKEN_URLS =
-		['https://accounts.google.com', '/o/oauth2/revoke', '?token='];
+const GOOGLE_REVOKE_TOKEN_URLS = ['https://accounts.google.com', '/o/oauth2/revoke', '?token='];
 
 const TESTDATA = {
 	email: 'email@developer.gserviceaccount.com',
 	scope: 'scope123',
 	key: KEYCONTENTS
-};
-
-const TESTDATA_KEYFILE = {
-	email: 'email@developer.gserviceaccount.com',
-	sub: 'developer@gmail.com',
-	scope: 'scope123',
-	keyFile: KEYFILE
-};
-
-const TESTDATA_UNKNOWN = {
-	keyFile: UNKNOWN_KEYFILE
-};
-
-const TESTDATA_KEYFILENOEMAIL = {
-	scope: 'scope123',
-	keyFile: KEYFILE
-};
-
-const TESTDATA_KEYFILEJSON = {
-	scope: 'scope123',
-	keyFile: KEYFILEJSON
-};
-
-const TESTDATA_KEYFILENOEMAILJSON = {
-	scope: 'scope123',
-	keyFile: KEYFILENOEMAILJSON
 };
 
 nock.disableNetConnect();
@@ -195,48 +164,8 @@ test('getToken()', async t => {
 		t.pass('should error when key not set');
 	}
 
-// 	it('should read .pem keyFile from file', done => {
-// 		const gtoken = new GoogleToken(TESTDATA_KEYFILE);
-// 		const scope = createGetTokenMock();
-// 		gtoken.getToken((err, token) => {
-// 			assert.deepStrictEqual(gtoken.key, KEYCONTENTS);
-// 			scope.done();
-// 			done();
-// 		});
-// 	});
-
-// 	it('should read .pem keyFile from file async', async () => {
-	gtoken = new GoogleToken(TESTDATA_KEYFILE);
-	let scope = createGetTokenMock();
-	let token = await gtoken.getToken();
-	scope.done();
-	t.is(gtoken.key, KEYCONTENTS);
-
-// 	it('should return error if iss is not set with .pem', done => {
-// 		const gtoken = new GoogleToken(TESTDATA_KEYFILENOEMAIL);
-// 		gtoken.getToken(err => {
-// 			assert(err);
-// 			if (err) {
-// 				// assert.strictEqual(
-// 				// 		(err as NodeJS.ErrnoException).code, 'MISSING_CREDENTIALS');
-// 				done();
-// 			}
-// 		});
 	t.end()
 });
-
-// 	it('should read .json key from file', done => {
-// 		const gtoken = new GoogleToken(TESTDATA_KEYFILEJSON);
-// 		const scope = createGetTokenMock();
-// 		gtoken.getToken((err, token) => {
-// 			scope.done();
-// 			assert.strictEqual(err, null);
-// 			const parsed = JSON.parse(KEYJSONCONTENTS);
-// 			assert.deepStrictEqual(gtoken.key, parsed.private_key);
-// 			assert.deepStrictEqual(gtoken.iss, parsed.client_email);
-// 			done();
-// 		});
-// 	});
 
 // 	it('should accept additional claims', async () => {
 // 		const opts = Object.assign(
