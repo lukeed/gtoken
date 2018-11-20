@@ -6,7 +6,7 @@
  */
 
 import { stringify } from 'querystring';
-import { get, post } from 'httpie';
+import { send } from 'httpie';
 import { sign } from 'jws';
 
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
@@ -60,7 +60,7 @@ export class GoogleToken {
 			throw new Error('No token to revoke.');
 		}
 
-		return get(GOOGLE_REVOKE_TOKEN_URL + this.token).then(r => {
+		return send('GET', GOOGLE_REVOKE_TOKEN_URL + this.token).then(r => {
 			this.configure({
 				key: this.key,
 				scope: this.scope,
@@ -89,7 +89,7 @@ export class GoogleToken {
 		let assertion = sign({ header:{ alg }, payload, secret:this.key });
 		let body = stringify({ grant_type, assertion });
 
-		return post(GOOGLE_TOKEN_URL, { headers, body }).then(r => {
+		return send('POST', GOOGLE_TOKEN_URL, { headers, body }).then(r => {
 			this.rawToken = r.data;
 			this.token = r.data.access_token;
 			this.expiresAt = (r.data.expires_in == null) ? null : (iat + r.data.expires_in) * 1e3;
