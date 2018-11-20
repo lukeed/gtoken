@@ -1,50 +1,30 @@
-# node-gtoken
-
-[![NPM Version][npm-image]][npm-url]
-[![CircleCI][circle-image]][circle-url]
-[![Dependency Status][david-image]][david-url]
-[![devDependency Status][david-dev-image]][david-dev-url]
-[![Known Vulnerabilities][snyk-image]][snyk-url]
-[![codecov][codecov-image]][codecov-url]
-[![style badge][gts-image]][gts-url]
+# node-gtoken [![Build Status](https://badgen.now.sh/travis/lukeed/gtoken)](https://travis-ci.org/lukeed/gtoken)
 
 Node.js Google Authentication Service Account Tokens
+
+> **Important:** This fork will change according to _my_ needs and **will not be maintained** for public use!
 
 ## Installation
 
 ``` sh
-npm install gtoken
+npm install @lukeed/gtoken
 ```
 
 ## Usage
 
-### Use with a `.pem` key file:
-
-``` js
-const { GoogleToken } = require('gtoken');
+```js
+const { GoogleToken } = require('@lukeed/gtoken');
 const gtoken = new GoogleToken({
-  keyFile: 'path/to/key.pem',
   email: 'my_service_account_email@developer.gserviceaccount.com',
-  scope: ['https://scope1', 'https://scope2'] // or space-delimited string of scopes
+  scope: ['https://scope1', 'https://scope2'], // or space-delimited string of scopes
+  key: '-----BEGIN RSA PRIVATE KEY-----\nXXXXXXXXXXX...'
 });
 
-gtoken.getToken(function(err, token) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log(token);
-});
-```
-
-You can also use the async/await style API:
-
-``` js
 const token = await gtoken.getToken()
 console.log(token);
 ```
 
-Or use promises:
+Or with promises:
 
 ```js
 gtoken.getToken()
@@ -54,36 +34,6 @@ gtoken.getToken()
   .catch(e => console.error);
 ```
 
-### Use with a service account `.json` key file:
-
-``` js
-const { GoogleToken } = require('gtoken');
-const gtoken = new GoogleToken({
-  keyFile: 'path/to/key.json',
-  scope: ['https://scope1', 'https://scope2'] // or space-delimited string of scopes
-});
-
-gtoken.getToken(function(err, token) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log(token);
-});
-```
-
-### Pass the private key as a string directly:
-
-``` js
-const key = '-----BEGIN RSA PRIVATE KEY-----\nXXXXXXXXXXX...';
-const { GoogleToken } = require('gtoken');
-const gtoken = new GoogleToken({
-  email: 'my_service_account_email@developer.gserviceaccount.com',
-  scope: ['https://scope1', 'https://scope2'], // or space-delimited string of scopes
-  key: key
-});
-```
-
 ## Options
 
 > Various options that can be set when creating initializing the `gtoken` object.
@@ -91,26 +41,14 @@ const gtoken = new GoogleToken({
 - `options.email or options.iss`: The service account email address.
 - `options.scope`: An array of scope strings or space-delimited string of scopes.
 - `options.sub`: The email address of the user requesting delegated access.
-- `options.keyFile`: The filename of `.json` key, or `.pem` key.
-- `options.key`: The raw RSA private key value, in place of using `options.keyFile`.
+- `options.key`: The raw RSA private key value
 
-### .getToken(callback)
+### .getToken()
 
 > Returns the cached token or requests a new one and returns it.
 
 ``` js
-gtoken.getToken(function(err, token) {
-  console.log(err || token);
-  // gtoken.token value is also set
-});
-```
-
-### .getCredentials('path/to/key.json')
-
-> Given a keyfile, returns the key and (if available) the client email.
-
-```js
-const creds = await gtoken.getCredentials('path/to/key.json');
+await gtoken.getToken();
 ```
 
 ### Properties
@@ -122,16 +60,12 @@ const creds = await gtoken.getCredentials('path/to/key.json');
 - `gtoken.key`: The raw key value.
 - `gtoken.rawToken`: Most recent raw token data received from Google.
 
-### .hasExpired()
+### .isExpired()
 
 > Returns true if the token has expired, or token does not exist.
 
 ``` js
-gtoken.getToken(function(err, token) {
-  if(token) {
-    gtoken.hasExpired(); // false
-  }
-});
+gtoken.isExpired(); // false
 ```
 
 ### .revokeToken()
@@ -139,43 +73,11 @@ gtoken.getToken(function(err, token) {
 > Revoke the token if set.
 
 ``` js
-gtoken.revokeToken(function(err) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log('Token revoked!');
-});
+await gtoken.revokeToken();
 ```
 
-## Changelog
-
-### 1.2.2 -> 2.0.0
-New features:
-- API now supports callback and promise based workflows
-
-Breaking changes:
-- `GoogleToken` is now a class type, and must be instantiated.
-- `GoogleToken.expires_at` renamed to `GoogleToken.expiresAt`
-- `GoogleToken.raw_token` renamed to `GoogleToken.rawToken`
-- `GoogleToken.token_expires` renamed to `GoogleToken.tokenExpires`
 
 ## License
 
-[MIT](LICENSE)
+(MIT) Copyright 2018 Google LLC
 
-[circle-image]: https://circleci.com/gh/google/node-gtoken.svg?style=svg
-[circle-url]: https://circleci.com/gh/google/node-gtoken
-[codecov-image]: https://codecov.io/gh/google/node-gtoken/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/google/node-gtoken
-[david-image]: https://david-dm.org/google/node-gtoken.svg
-[david-url]: https://david-dm.org/google/node-gtoken
-[david-dev-image]: https://david-dm.org/google/node-gtoken/dev-status.svg
-[david-dev-url]: https://david-dm.org/google/node-gtoken?type=dev
-[gdevconsole]: https://console.developers.google.com
-[gts-image]: https://img.shields.io/badge/code%20style-Google%20%E2%98%82%EF%B8%8F-blue.svg
-[gts-url]: https://www.npmjs.com/package/gts
-[npm-image]: https://img.shields.io/npm/v/gtoken.svg
-[npm-url]: https://npmjs.org/package/gtoken
-[snyk-image]: https://snyk.io/test/github/google/node-gtoken/badge.svg
-[snyk-url]: https://snyk.io/test/github/google/node-gtoken
