@@ -46,8 +46,6 @@ class ErrorWithCode extends Error {
   }
 }
 
-let getPem: ((filename: string) => Promise<string>)|undefined;
-
 export class GoogleToken {
   token?: string|null = null;
   expiresAt?: number|null = null;
@@ -76,9 +74,8 @@ export class GoogleToken {
    * @return true if the token has expired, false otherwise.
    */
   hasExpired() {
-    const now = (new Date()).getTime();
     if (this.token && this.expiresAt) {
-      return now >= this.expiresAt;
+      return Date.now() >= this.expiresAt;
     } else {
       return true;
     }
@@ -203,12 +200,9 @@ export class GoogleToken {
     this.iss = options.email || options.iss;
     this.sub = options.sub;
     this.additionalClaims = options.additionalClaims;
-
-    if (typeof options.scope === 'object') {
-      this.scope = options.scope.join(' ');
-    } else {
-      this.scope = options.scope;
-    }
+    this.scope = Array.isArray(options.scope)
+      ? options.scope.join(' ')
+      : options.scope;
   }
 
   /**
@@ -227,8 +221,7 @@ export class GoogleToken {
           sub: this.sub
         },
         additionalClaims);
-    const signedJWT =
-        jws.sign({header: {alg: 'RS256'}, payload, secret: this.key});
+    const signedJWT = jws.sign({header: {alg: 'RS256'}, payload, secret: this.key});
     return request<TokenData>({
              method: 'POST',
              url: GOOGLE_TOKEN_URL,
