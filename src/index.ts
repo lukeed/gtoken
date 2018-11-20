@@ -6,12 +6,12 @@
  */
 
 import * as fs from 'fs';
+import { promisify } from 'util';
 import {request} from 'gaxios';
 import * as jws from 'jws';
 import * as mime from 'mime';
-import * as pify from 'pify';
 
-const readFile = pify(fs.readFile);
+const readFile = promisify(fs.readFile);
 
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
 const GOOGLE_REVOKE_TOKEN_URL =
