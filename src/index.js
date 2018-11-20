@@ -131,7 +131,7 @@ export class GoogleToken {
 		return post(uri, { headers }).then(r => {
 			this.rawToken = r.data;
 			this.token = r.data.access_token;
-			this.expiresAt = (r.data.expires_in == null) ? null : (iat + r.data.expires_in!) * 1e3;
+			this.expiresAt = (r.data.expires_in == null) ? null : (iat + r.data.expires_in) * 1e3;
 			return this.token;
 		}).catch(err => {
 			this.token = null;
