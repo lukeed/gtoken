@@ -29,11 +29,11 @@ export class GoogleToken {
 	 * Configure the GoogleToken for re-use.
 	 */
 	configure(opts={}) {
-		this.key = opts.key;
 		this.iss = opts.email || opts.iss;
-		this.additionalClaims = opts.additionalClaims;
 		this.token = this.expiresAt = this.rawToken = null;
+		this.key = opts.key && Buffer.from(opts.key, 'base64').toString();
 		this.scope = Array.isArray(opts.scope) ? opts.scope.join(' ') : opts.scope;
+		this.additionalClaims = opts.additionalClaims;
 		this.sub = opts.sub;
 	}
 
