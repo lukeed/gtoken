@@ -16,8 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "node builder",
-    "pretest": "node builder",
+    "build": "bundt",
+    "pretest": "bundt",
     "test": "tape test/*.js | tap-spec"
   },
   "dependencies": {
@@ -25,7 +25,7 @@
     "jws": "^3.1.5"
   },
   "devDependencies": {
-    "mk-dirs": "^1.0.0",
+    "bundt": "^0.3.0",
     "nock": "^10.0.2",
     "tap-spec": "^5.0.0",
     "tape": "^4.9.1"
