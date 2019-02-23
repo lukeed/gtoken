@@ -11,8 +11,7 @@ const { GoogleToken } = require('../dist/gtoken');
 const nock = require('nock');
 
 const EMAIL = 'example@developer.gserviceaccount.com';
-const KEYCONTENTS = readFileSync('./test/assets/key.pem', 'utf8');
-const KEYJSONCONTENTS = readFileSync('./test/assets/key.json', 'utf8');
+const KEYCONTENTS = readFileSync('./test/assets/key.pem', 'base64');
 const GOOGLE_TOKEN_URLS = ['https://www.googleapis.com', '/oauth2/v4/token'];
 const GOOGLE_REVOKE_TOKEN_URLS = ['https://accounts.google.com', '/o/oauth2/revoke', '?token='];
 
