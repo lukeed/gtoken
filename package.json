@@ -1,6 +1,6 @@
 {
   "name": "@lukeed/gtoken",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "repository": "lukeed/node-gtoken",
   "description": "Node.js Google Authentication Service Account Tokens",
   "module": "dist/gtoken.mjs",
