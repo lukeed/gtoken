@@ -22,7 +22,8 @@ export class GoogleToken {
 	}
 
 	isExpired() {
-		return Date.now() >= (this.token && this.expiresAt);
+		if (!this.token || !this.expiresAt) return true;
+		return Date.now() >= this.expiresAt;
 	}
 
 	/**
@@ -30,10 +31,10 @@ export class GoogleToken {
 	 */
 	configure(opts={}) {
 		this.iss = opts.email || opts.iss;
-		this.token = this.expiresAt = this.rawToken = null;
 		this.key = opts.key && Buffer.from(opts.key, 'base64').toString();
 		this.scope = Array.isArray(opts.scope) ? opts.scope.join(' ') : opts.scope;
 		this.additionalClaims = opts.additionalClaims;
+		this.token = this.expiresAt = null;
 		this.sub = opts.sub;
 	}
 
@@ -90,21 +91,18 @@ export class GoogleToken {
 		let body = stringify({ grant_type, assertion });
 
 		return send('POST', GOOGLE_TOKEN_URL, { headers, body }).then(r => {
-			this.rawToken = r.data;
 			this.token = r.data.access_token;
 			this.expiresAt = (r.data.expires_in == null) ? null : (iat + r.data.expires_in) * 1e3;
 			return this.token;
 		}).catch(err => {
-			this.token = null;
-			this.expiresAt = null;
+			this.token = this.expiresAt = null;
 			let body = err.data || {};
 			if (body.error) {
 				let msg = String(body.error);
 				if (body.error_description) msg += `: ${body.error_description}`;
-				throw new Error(msg);
-			} else {
-				throw err;
+				err.message = msg;
 			}
+			throw err;
 		});
 	}
 }
