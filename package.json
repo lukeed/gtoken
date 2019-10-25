@@ -5,6 +5,7 @@
   "description": "Node.js Google Authentication Service Account Tokens",
   "module": "dist/gtoken.mjs",
   "main": "dist/gtoken.js",
+  "types": "gtoken.d.ts",
   "license": "MIT",
   "author": {
     "name": "Ryan Seys"
@@ -13,6 +14,7 @@
     "node": ">=8"
   },
   "files": [
+    "*.d.ts",
     "dist"
   ],
   "scripts": {
